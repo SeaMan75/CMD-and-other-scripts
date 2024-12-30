@@ -1,0 +1,50 @@
+::@echo off
+setlocal
+
+:: Получаем текущую дату в формате YYYYMMDD с помощью PowerShell
+for /f %%i in ('powershell -NoProfile -Command "Get-Date -Format yyyyMMdd"') do set currentDate=%%i
+
+:: Устанавливаем путь к основной папке
+set "baseDir=F:\VK_Projects\............................."
+
+:: Проверяем наличие основной папки, если не существует - создаем
+if not exist "%baseDir%" (
+mkdir "%baseDir%"
+)
+
+:: Переходим в основную папку
+cd /d "%baseDir%"
+
+:: Устанавливаем начальный суффикс
+set "suffix=1"
+
+:check_folder
+:: Формируем суффикс с ведущим нулем, если необходимо
+if %suffix% LSS 10 (
+ set "formattedSuffix=0%suffix%"
+) else (
+ set "formattedSuffix=%suffix%"
+)
+
+:: Устанавливаем имя папки по маске текущей даты и суффикса
+set "dateFolder=%currentDate%_%formattedSuffix%"
+
+:: Проверяем наличие папки по маске, если существует - увеличиваем суффикс
+if exist "%dateFolder%" (
+ set /a suffix+=1
+ goto check_folder
+)
+
+:: Создаем папку и необходимые подпапки
+mkdir "%dateFolder%"
+cd "%dateFolder%"
+mkdir Files
+mkdir "Explanatory notes"
+mkdir Examples
+mkdir Project
+
+:: Создаем файл в папке Explanatory notes
+cd "Explanatory notes"
+type nul > "V1.0.0.1 - Explanatory notes.docx"
+
+endlocal
